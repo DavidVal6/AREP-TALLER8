@@ -16,8 +16,7 @@ public class UserService {
 
     public UserService() {
         users = Collections.synchronizedSet(new HashSet<>());
-        addUser(new User("jorge", "12345"));
-        addUser(new User("juca", "54321"));
+        addUser(new User("lucas", "123"));
     }
 
     public Set<UserResponse> list() {

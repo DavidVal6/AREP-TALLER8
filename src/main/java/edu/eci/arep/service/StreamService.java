@@ -7,11 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
-
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Sorts;
 
 
@@ -22,20 +23,27 @@ import edu.eci.arep.response.StreamResponse;
 @ApplicationScoped
 public class StreamService {
     
-    private static String mongoURL = "mongodb://mydb:27017";
-    private static MongoClient mongoClient = setMongo();
+    //private static String mongoURL = "mongodb://mydb:27017";
+
+    @Inject
+    private MongoClient mongoClient;
 
 
-    private static MongoClient setMongo(){
-        MongoClient mongoClient11 = MongoClients.create(mongoURL);
-        return mongoClient11;
-    }
+/*     private static MongoClient setMongo(){
+        try{
+        MongoClient mongoClient = new MongoClient("mongo-db",27017);
+        return mongoClient;
+        }catch(Exception i){
+            i.printStackTrace();
+        }
+        return null;
+    } */
 
-    public static List<StreamResponse> getStreams() {
+    public  List<StreamResponse> getStreams() {
         List<StreamResponse> posts = new ArrayList<>();
         try (MongoCursor<Document> cursor = getCollection().find().sort(Sorts.descending("creationDate")).limit(10).iterator()) {
             while (cursor.hasNext()) {
-                Document document = cursor.next();
+                Document document = cursor.next();  
                 StreamResponse post = new StreamResponse();
 
                 post.setAuthor(document.getString("author"));
@@ -47,7 +55,7 @@ public class StreamService {
         return posts;
     }
 
-    public static List<StreamResponse> add(Post newMessage) {
+    public  List<StreamResponse> add(Post newMessage) {
         Post message = new Post(newMessage.getAuthor(), newMessage.getMessage());
 
         Document document = new Document()
@@ -60,8 +68,8 @@ public class StreamService {
         return getStreams();
     }
 
-    private static MongoCollection<Document> getCollection() {
-        return mongoClient.getDatabase("post").getCollection("posts");
+    public  MongoCollection<Document> getCollection() {
+        return mongoClient.getDatabase("mydb").getCollection("messages");
     }
 
 }
